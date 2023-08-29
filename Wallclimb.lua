@@ -7,8 +7,8 @@ local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 local Humanoid = Character:WaitForChild("Humanoid")
 local Animator = Humanoid:FindFirstChildOfClass("Animator")
 
-local MARGIN_OF_ERROR = 0.5
-local SPEED = 0.01
+local MARGIN_OF_ERROR = 1
+local SPEED = 0.05
 
 local WasJustClimbing = false
 local IsEnabled = false
@@ -38,6 +38,7 @@ local function StopAllAnimations()
         Animation:Stop()
     end
 end
+local NegativeSurfaceNormal = nil
 local function OnMovementInput(Input, GPE)
     if GPE then return end
     if not WasJustClimbing then return end
@@ -49,7 +50,7 @@ local function OnMovementInput(Input, GPE)
             if not WasJustClimbing then break end
             local CombinedInfo = HumanoidRootPart.CFrame[Object.Direction] * Object.Sign
             local HrpPosition = HumanoidRootPart.Position
-            Character:PivotTo(CFrame.lookAt(HrpPosition + CombinedInfo * SPEED, HrpPosition + HumanoidRootPart.CFrame.LookVector))
+            Character:PivotTo(CFrame.lookAt(HrpPosition + CombinedInfo * SPEED, HrpPosition + NegativeSurfaceNormal))
             if CanAdjacentClimb then
                 HrpPosition = HumanoidRootPart.Position
                 local CastResults = workspace:Raycast(HrpPosition, CombinedInfo * SizeX, CastParams)
@@ -79,10 +80,12 @@ RunService.Heartbeat:Connect(function()
     local Pos = HumanoidRootPart.Position
     local CastResults = workspace:Raycast(Pos, HumanoidRootPart.CFrame.LookVector * SizeZ, CastParams)
     if CastResults then
+        NegativeSurfaceNormal = -CastResults.Normal
         if not WasJustClimbing then
             WasJustClimbing = true
-            HumanoidRootPart.Anchored = true
             StopAllAnimations()
+            HumanoidRootPart.Anchored = true
+            Character:PivotTo(CFrame.lookAt(HumanoidRootPart.Position, HumanoidRootPart.Position + NegativeSurfaceNormal))
         end
         if not DidInitializeConnection then
             DidInitializeConnection = true
