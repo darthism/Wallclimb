@@ -32,7 +32,6 @@ local KeyToDirection = {
     [Enum.KeyCode.D] = GetDirectionObject(1, "RightVector"),
 
 }
-local MovementConnection = nil
 local function StopAllAnimations()
     for _, Animation in ipairs(Animator:GetPlayingAnimationTracks()) do
         Animation:Stop()
@@ -48,9 +47,11 @@ local function OnMovementInput(Input, GPE)
     if Object then
         while UserInputService:IsKeyDown(KeyCode) do
             if not WasJustClimbing then break end
+            print("HOLDING")
             local CombinedInfo = HumanoidRootPart.CFrame[Object.Direction] * Object.Sign
             local HrpPosition = HumanoidRootPart.Position
-            Character:PivotTo(CFrame.lookAt(HrpPosition + CombinedInfo * SPEED, HrpPosition + NegativeSurfaceNormal))
+            --Character:PivotTo(CFrame.lookAt(HrpPosition + CombinedInfo * SPEED, HrpPosition + NegativeSurfaceNormal))
+            Character:PivotTo(HumanoidRootPart.CFrame * CFrame.new(HrpPosition + CombinedInfo * SPEED):ToObjectSpace(HumanoidRootPart.CFrame))
             if CanAdjacentClimb then
                 HrpPosition = HumanoidRootPart.Position
                 local CastResults = workspace:Raycast(HrpPosition, CombinedInfo * SizeX, CastParams)
