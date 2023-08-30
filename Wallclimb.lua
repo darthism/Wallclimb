@@ -7,8 +7,8 @@ local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 local Humanoid = Character:WaitForChild("Humanoid")
 local Animator = Humanoid:FindFirstChildOfClass("Animator")
 
-local MARGIN_OF_ERROR = 3
-local SPEED = 0.05
+local MARGIN_OF_ERROR = 1
+local SPEED = 0.2
 
 local WasJustClimbing = false
 local IsEnabled = false
@@ -19,17 +19,11 @@ local DidInitializeConnection = false
 local SizeX = HumanoidRootPart.Size.X / 2 + MARGIN_OF_ERROR
 local SizeY = HumanoidRootPart.Size.Y / 2 + MARGIN_OF_ERROR
 local WallGrabRange = HumanoidRootPart.Size.Z / 2 + MARGIN_OF_ERROR
-local function GetDirectionObject(Sign, Direction)
-    return {
-        Sign = Sign,
-        Direction = Direction,
-    }
-end
 local KeyToDirection = {
-    [Enum.KeyCode.W] = GetDirectionObject(1, "UpVector"),
-    [Enum.KeyCode.A] = GetDirectionObject(-1, "RightVector"),
-    [Enum.KeyCode.S] = GetDirectionObject(-1, "UpVector"),
-    [Enum.KeyCode.D] = GetDirectionObject(1, "RightVector"),
+	[Enum.KeyCode.W] = Vector3.yAxis,
+	[Enum.KeyCode.A] = -Vector3.xAxis,
+	[Enum.KeyCode.S] = -Vector3.yAxis,
+	[Enum.KeyCode.D] = Vector3.xAxis,
 
 }
 local function StopAllAnimations()
@@ -47,23 +41,7 @@ local function OnMovementInput(Input, GPE)
     if Object then
         while UserInputService:IsKeyDown(KeyCode) do
             if not WasJustClimbing then break end
-            print("HOLDING")
-            local CombinedInfo = HumanoidRootPart.CFrame[Object.Direction] * Object.Sign
-            local HrpPosition = HumanoidRootPart.Position
-            Character:PivotTo(Character:GetPivot() * CFrame.new(CombinedInfo * SPEED))
-            if CanAdjacentClimb then
-                HrpPosition = HumanoidRootPart.Position
-                local CastResults = workspace:Raycast(HrpPosition, CombinedInfo * SizeX, CastParams)
-                if CastResults and CastResults.Instance then
-                    local Part = CastResults.Instance
-                    local CastPosition = CastResults.Position
-                    local Normal = CastResults.Normal
-                    if Part:IsA("Part") then
-                        Character:PivotTo(CFrame.lookAt(CastPosition + Normal * WallGrabRange / 2, CastPosition + -Normal))
-                        break
-                    end
-                end
-            end
+			Character:PivotTo(Character:GetPivot() * CFrame.new(Object * SPEED))
             task.wait()
         end  
     end
@@ -93,7 +71,6 @@ RunService.Heartbeat:Connect(function()
             UserInputService.InputBegan:Connect(OnExit)
         end
     else
-        print(3)
         WasJustClimbing = false
     end
 end)
