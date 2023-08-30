@@ -7,7 +7,7 @@ local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 local Humanoid = Character:WaitForChild("Humanoid")
 local Animator = Humanoid:FindFirstChildOfClass("Animator")
 
-local MARGIN_OF_ERROR = 0.5
+local MARGIN_OF_ERROR = 3
 local SPEED = 0.05
 
 local WasJustClimbing = false
@@ -18,7 +18,7 @@ CastParams.FilterDescendantsInstances = Character:GetDescendants()
 local DidInitializeConnection = false
 local SizeX = HumanoidRootPart.Size.X / 2 + MARGIN_OF_ERROR
 local SizeY = HumanoidRootPart.Size.Y / 2 + MARGIN_OF_ERROR
-local SizeZ = HumanoidRootPart.Size.Z / 2 + MARGIN_OF_ERROR
+local WallGrabRange = HumanoidRootPart.Size.Z / 2 + MARGIN_OF_ERROR
 local function GetDirectionObject(Sign, Direction)
     return {
         Sign = Sign,
@@ -59,7 +59,7 @@ local function OnMovementInput(Input, GPE)
                     local CastPosition = CastResults.Position
                     local Normal = CastResults.Normal
                     if Part:IsA("Part") then
-                        Character:PivotTo(CFrame.lookAt(CastPosition + Normal * SizeZ / 2, CastPosition + -Normal))
+                        Character:PivotTo(CFrame.lookAt(CastPosition + Normal * WallGrabRange / 2, CastPosition + -Normal))
                         break
                     end
                 end
@@ -78,7 +78,7 @@ local function OnExit(Input, GPE)
 end
 RunService.Heartbeat:Connect(function()
     local Pos = HumanoidRootPart.Position
-    local CastResults = workspace:Raycast(Pos, HumanoidRootPart.CFrame.LookVector * SizeZ, CastParams)
+    local CastResults = workspace:Raycast(Pos, HumanoidRootPart.CFrame.LookVector * WallGrabRange, CastParams)
     if CastResults then
         NegativeSurfaceNormal = -CastResults.Normal
         if not WasJustClimbing then
