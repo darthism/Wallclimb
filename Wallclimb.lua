@@ -7,7 +7,7 @@ local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 local Humanoid = Character:WaitForChild("Humanoid")
 local Animator = Humanoid:FindFirstChildOfClass("Animator")
 
-local MARGIN_OF_ERROR = 1
+local MARGIN_OF_ERROR = 0.5
 local SPEED = 0.05
 
 local WasJustClimbing = false
@@ -50,8 +50,7 @@ local function OnMovementInput(Input, GPE)
             print("HOLDING")
             local CombinedInfo = HumanoidRootPart.CFrame[Object.Direction] * Object.Sign
             local HrpPosition = HumanoidRootPart.Position
-            --Character:PivotTo(CFrame.lookAt(HrpPosition + CombinedInfo * SPEED, HrpPosition + NegativeSurfaceNormal))
-            Character:PivotTo(HumanoidRootPart.CFrame * CFrame.new(HrpPosition + CombinedInfo * SPEED):ToObjectSpace(HumanoidRootPart.CFrame))
+            Character:PivotTo(Character:GetPivot() * CFrame.new(CombinedInfo * SPEED))
             if CanAdjacentClimb then
                 HrpPosition = HumanoidRootPart.Position
                 local CastResults = workspace:Raycast(HrpPosition, CombinedInfo * SizeX, CastParams)
@@ -94,6 +93,7 @@ RunService.Heartbeat:Connect(function()
             UserInputService.InputBegan:Connect(OnExit)
         end
     else
+        print(3)
         WasJustClimbing = false
     end
 end)
